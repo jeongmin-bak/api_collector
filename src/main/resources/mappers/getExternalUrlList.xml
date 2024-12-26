@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.externalurl.repository.ExternalRepository">
+    <select id="getAllUrlList" resultType="java.util.HashMap">
+        SELECT DISTINCT DATA_PROVIDER,
+                        API_URL,
+                        DATA_FORMAT
+        FROM RAWAPIDATA
+        ORDER BY DATA_PROVIDER
+    </select>
+
+    <select id="checkDuplicationUrl" resultType="String">
+        SELECT DISTINCT API_URL
+        FROM RAWAPIDATA
+        WHERE API_URL = #{apiUrl}
+    </select>
+
+    <insert id="insertApiJdbcInfo" parameterType="HashMap">
+        INSERT INTO RAWAPIJDBCINFO
+        (
+             API_ID
+           , JDBC_URL
+           , JDBC_DRIVER
+           , CONN_POOL
+           , JDBC_ID
+           , JDBC_PW
+        ) VALUES
+          (
+           #{API_ID},
+           #{JDBC_URL},
+           #{JDBC_DRIVER},
+           #{CON_CNT},
+           #{JDBC_ID},
+           #{JDBC_PW}
+           )
+    </insert>
+
+    <insert id="insertApiUrlInfo" parameterType="hashMap">
+        INSERT INTO RAWAPIINFO
+        (
+              API_ID
+            , API_URL
+            , API_SVC
+            , IS_QUERY
+            , IS_PATH
+            , DATA_FORMAT
+            , API_EXPL
+            , USER_KEY
+            , USER_AUTH
+        ) VALUES
+        (
+            #{API_ID},
+            #{BASE_URL},
+            #{API_SVC},
+            #{IS_QUERY},
+            #{IS_PATH},
+            #{DATA_FORMAT},
+            #{URL_EXPL},
+            #{CONS_KEY},
+            #{CONS_SC_KEY}
+        )
+    </insert>
+
+</mapper>
