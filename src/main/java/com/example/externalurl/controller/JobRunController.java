@@ -21,7 +21,7 @@ public class JobRunController {
 
     @PostMapping("/run")
     public void jonRunRequest(@RequestBody Map<String, Object> metaInfo){
-        log.info("start api url request processing start! ");
+        //log.info("start api url request processing start! ");
 
         // 화면에서 넘어 온 파라미터들은 json으로 저장된다.
 

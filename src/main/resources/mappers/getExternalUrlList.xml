@@ -18,7 +18,7 @@
     <insert id="insertApiJdbcInfo" parameterType="HashMap">
         INSERT INTO RAWAPIJDBCINFO
         (
-             API_ID
+             ID
            , JDBC_URL
            , JDBC_DRIVER
            , CONN_POOL
