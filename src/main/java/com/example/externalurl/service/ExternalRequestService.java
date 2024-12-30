@@ -22,6 +22,7 @@ public class ExternalRequestService {
     private final ExternalRepository externalRepository;
     public List<Map<String, Object>> getUrlList(){
         List<Map<String, Object>> resultList = externalRepository.getAllUrlList();
+        LOGGER.info("result List : {}", resultList.stream().toList());
         return resultList;
     }
 

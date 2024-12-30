@@ -26,7 +26,7 @@ public class ExternalRequestController {
     public Map<String, Object> getUrlList(){
         LOGGER.info("Request Success!!");
         List<Map<String, Object>> urlList =  externalRequestService.getUrlList();
-
+        LOGGER.info("Url List : {}", urlList.stream().toList());
         Map<String, Object> resultList = new HashMap<>();
         resultList.put("resultList", urlList);
         return resultList;
