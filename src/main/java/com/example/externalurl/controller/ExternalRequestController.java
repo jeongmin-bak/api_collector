@@ -20,8 +20,7 @@ import java.util.Map;
 public class ExternalRequestController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalRequestController.class);
 
-    @Autowired
-    ExternalRequestService externalRequestService;
+    private final ExternalRequestService externalRequestService;
 
     @PostMapping("/getExternalUrlList")
     public Map<String, Object> getUrlList(){

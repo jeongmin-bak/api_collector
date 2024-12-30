@@ -26,7 +26,7 @@
            , JDBC_PW
         ) VALUES
           (
-           #{API_ID},
+           #{ID},
            #{JDBC_URL},
            #{JDBC_DRIVER},
            #{CON_CNT},
@@ -44,9 +44,15 @@
             , IS_QUERY
             , IS_PATH
             , DATA_FORMAT
+            , DATA_PV_GP
+            , DATA_PROVIDER
             , API_EXPL
             , USER_KEY
             , USER_AUTH
+            , KEY_NAME
+            , PAGE_COL_NM
+            , TC_COL_NM
+            , JDBC_ID
         ) VALUES
         (
             #{API_ID},
@@ -55,9 +61,15 @@
             #{IS_QUERY},
             #{IS_PATH},
             #{DATA_FORMAT},
-            #{URL_EXPL},
-            #{CONS_KEY},
-            #{CONS_SC_KEY}
+            #{DATA_PV_GP},
+            #{DATA_PROVIDER},
+            #{API_EXPL},
+            #{AUTH_KEY},
+            #{AUTH_SECRET},
+            #{KEY_NAME},
+            #{PAGE_COL_NM},
+            #{TC_COL_NM},
+            #{JDBC_ID}
         )
     </insert>
 

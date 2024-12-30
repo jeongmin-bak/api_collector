@@ -2,9 +2,9 @@ package com.example.externalurl.service;
 
 import com.example.externalurl.controller.ExternalRequestController;
 import com.example.externalurl.repository.ExternalRepository;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
@@ -16,10 +16,10 @@ import java.util.Map;
 import java.util.Random;
 
 @Service
+@RequiredArgsConstructor
 public class ExternalRequestService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalRequestService.class);
-    @Autowired
-    ExternalRepository externalRepository;
+    private final ExternalRepository externalRepository;
     public List<Map<String, Object>> getUrlList(){
         List<Map<String, Object>> resultList = externalRepository.getAllUrlList();
         return resultList;
@@ -57,8 +57,11 @@ public class ExternalRequestService {
         String ApiKey = "API"+ "-" + generateCode();
         LOGGER.info("API KEY : {} ", ApiKey);
 
+        String JdbcKey = "JB-"+generateCode();
+
         // JDBC 파라미터 조립
         Map<String, Object> jdbcParam = new HashMap<>(){{
+                put("ID", JdbcKey);
                 put("JDBC_URL", inputParameter.get("JDBC_URL"));
                 put("JDBC_DRIVER", inputParameter.get("JDBC_DRIVER"));
                 put("CON_CNT", inputParameter.get("CON_CNT"));
@@ -70,15 +73,22 @@ public class ExternalRequestService {
         // Api Info 조립
         Map<String, Object> apiInfoParam = new HashMap<>(){{
             put("API_ID", ApiKey);
-            put("baseUrl", inputParameter.get("baseUrl"));
-            put("AUTH_KEY", inputParameter.get("AUTH_KEY"));
-            put("AUTH_SECRET", inputParameter.get("AUTH_SECRET"));
+            put("BASE_URL", inputParameter.get("baseUrl"));
+            put("API_SVC", inputParameter.get("API_SVC"));
             put("IS_QUERY", inputParameter.get("isQueryParam"));
             put("IS_PATH", inputParameter.get("isPathParam"));
-            put("DATA_FORMAT", inputParameter.get("returnType"));
-            put("keyName", inputParameter.get("keyName"));
+            put("DATA_FORMAT", inputParameter.get("DATA_FORMAT"));
+            put("DATA_PV_GP", "01");
             put("DATA_PROVIDER", inputParameter.get("DATA_PROVIDER"));
+            put("API_EXPL", "");
+            put("AUTH_KEY", inputParameter.get("AUTH_KEY"));
+            put("AUTH_SECRET", inputParameter.get("AUTH_SECRET"));
+            put("KEY_NAME", inputParameter.get("keyName"));
+            put("PAGE_COL_NM", "");
+            put("TC_COL_NM", "");
+            put("JDBC_ID", JdbcKey);
         }};
+        LOGGER.info("apiInfoParam : {}", apiInfoParam);
         saveApiInfo(apiInfoParam);
     }
 

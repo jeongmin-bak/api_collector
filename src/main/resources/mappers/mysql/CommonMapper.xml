@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.externalurl.repository.MySqlMapper">
+    <select id="getCodeGroupId" resultType="java.util.HashMap">
+        SELECT CD
+        FROM CD_BAS
+        WHERE CD_GRP_ID='DATA_PROVIDER'
+          AND CD_NM=#{DATA_PROVIDER}
+    </select>
+</mapper>
