@@ -54,4 +54,13 @@ public class ExternalRequestController {
         LOGGER.info("apiUrl Save Start : {}", inputParameter.toString());
         externalRequestService.saveApiUrlInfo(inputParameter);
     }
+
+    @PostMapping("/selectApiDetailInfo")
+    public Map<String, Object> selectApiDetailInfo(@RequestBody Map<String, Object> inputParameter){
+        LOGGER.info("Api Detail Info Select Method Call!");
+        LOGGER.info("inputParameter : {}", inputParameter.toString());
+        Map<String, Object> tmpMap = externalRequestService.selectApiDetailInfo(inputParameter);
+        LOGGER.info("result : {} ", tmpMap.toString());
+        return tmpMap;
+    }
 }

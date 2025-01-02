@@ -2,17 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.externalurl.repository.ExternalRepository">
     <select id="getAllUrlList" resultType="java.util.HashMap">
-        SELECT  DATA_PROVIDER
+        SELECT
+                API_ID
+              , DATA_PV_GP
+              , DATA_PROVIDER
               , API_URL
               , DATA_FORMAT
               , API_EXPL
         FROM RAWAPIINFO
         ORDER BY DATA_PROVIDER
+--         SELECT DISTINCT DATA_PROVIDER,
+--                         API_URL,
+--                         DATA_FORMAT
+--         FROM RAWAPIDATA
+--         ORDER BY DATA_PROVIDER
     </select>
 
     <select id="checkDuplicationUrl" resultType="String">
         SELECT DISTINCT API_URL
-        FROM RAWAPIDATA
+        FROM RAWAPIINFO
         WHERE API_URL = #{apiUrl}
     </select>
 
@@ -73,5 +81,28 @@
             #{JDBC_ID}
         )
     </insert>
+
+    <select id="selectApiDetailInfo" parameterType="HashMap" resultType="HashMap">
+        SELECT
+               A.API_ID
+             , A.API_URL
+             , A.IS_QUERY
+             , A.IS_PATH
+             , A.DATA_FORMAT
+             , A.DATA_PROVIDER
+             , A.USER_KEY
+             , A.USER_AUTH
+             , A.KEY_NAME
+             , B.JDBC_URL
+             , B.JDBC_DRIVER
+             , B.CONN_POOL
+             , B.JDBC_ID
+             , B.JDBC_PW
+        FROM RAWAPIINFO A
+        INNER JOIN RAWAPIJDBCINFO B
+           ON A.JDBC_ID = B.ID
+          AND A.API_ID = #{API_ID}
+          AND A.API_URL = #{API_URL}
+    </select>
 
 </mapper>

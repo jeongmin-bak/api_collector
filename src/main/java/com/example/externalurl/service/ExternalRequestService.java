@@ -93,6 +93,18 @@ public class ExternalRequestService {
         saveApiInfo(apiInfoParam);
     }
 
+    public Map<String, Object> selectApiDetailInfo(Map<String, Object> apiInfoMap){
+        Map<String, Object> resultMap = new HashMap<>();
+        try{
+            resultMap = externalRepository.selectApiDetailInfo(apiInfoMap);
+            LOGGER.info("Select Result: {} ", resultMap.toString());
+        }catch(Exception e){
+            LOGGER.error("Select failed! {}", e.getMessage());
+            throw new IllegalArgumentException(e.getMessage());
+        }
+        return resultMap;
+    }
+
     private String generateCode(){
         String NUMBERS = "0123456789";
         String LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";

@@ -11,4 +11,5 @@ public interface ExternalRepository {
     String checkDuplicationUrl(String apiUrl);
     int insertApiJdbcInfo(Map<String, Object> jdbcInfo);
     int insertApiUrlInfo(Map<String, Object> apiUrlInfo);
+    Map<String, Object> selectApiDetailInfo(Map<String, Object> selectMap);
 }
