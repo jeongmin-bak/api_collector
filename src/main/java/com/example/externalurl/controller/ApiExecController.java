@@ -1,8 +1,10 @@
 package com.example.externalurl.controller;
 
+import com.example.externalurl.service.DbStorageHandler;
 import com.example.externalurl.service.StorageHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import job.Task;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,14 +46,30 @@ public class ApiExecController {
         });
     }
 
-    @PostMapping("/collect/start")
-    public void callApiJob(@RequestBody Map<String, Object> request){
+    @PostMapping("/execute/unload/data")
+    public void executeApiJob(@RequestBody Map<String, Object> request){
         log.info("Agent Api Collect Start");
+        String jobId= (String) request.get("JB_ID");
+        String srcUseType = "01"; // 수집
+        String fileSystem = "01"; // DB
         try {
             log.info("api url - 수신 데이터 : {}", request);
-            log.info("작업 ID: {}, 작업 날짜: {}", request.get("JB_ID"), request.get("JB_DT"));
+            log.info("작업 ID: {}, 작업 날짜: {}, 작업 유형: {}, fileSystem : {} ", jobId, request.get("JB_DT"), srcUseType.equals("01") ? "수집": "적재", fileSystem.equals("01") ? "DB": "기타");
+            StorageHandler storageHandler = storageHandlerMap.get(Constants.SRC_TYPE.get(fileSystem).toUpperCase());
+
+            storageHandler.handle(request);
+
         } catch (Exception e) {
             log.error("");
         }
+    }
+
+    private static class Constants {
+        public static final Map<String, String> SRC_TYPE = Map.of(
+                "01", "DB",
+                "02", "OBJECT",
+                "03", "FILE",
+                "04", "RESTAPI"
+        );
     }
 }

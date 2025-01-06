@@ -7,8 +7,8 @@ server:
 # 공통 경로 설정
 common:
   params:
-    extract_tmp_dir: /test
-    meta_info_path: /test
+    extract_tmp_dir: /Users/parkjungmin/Desktop/jungmin/external/externalUrl/src/main/resources/tmp
+    meta_info_path: /Users/parkjungmin/Desktop/jungmin/external/externalUrl/src/main/resources/json
 
 # agent 관련
 agent:

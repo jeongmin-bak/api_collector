@@ -1,5 +1,5 @@
 ### 1. v1/api post 요청
-POST http://localhost:9090/v1/api/collect/start
+POST http://localhost:9090/v1/api/execute/unload/data
 Content-Type: application/json
 
 {
