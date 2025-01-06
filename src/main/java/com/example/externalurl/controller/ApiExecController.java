@@ -17,17 +17,18 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/v1/api")
+@RequiredArgsConstructor
 public class ApiExecController {
     private final ObjectMapper objectMapper;
     private final ApplicationContext applicationContext;
+    private final Map<String, StorageHandler> storageHandlerMap = new HashMap<>();
+
 
     @Value("10")
     private int concurrentJobCount;
     private String restUrl;
 
-    private final Map<String, StorageHandler> storageHandlerMap = new HashMap<>();
 
     @PostConstruct
     public void init(){
@@ -39,7 +40,6 @@ public class ApiExecController {
             String type = handler.getClass().getSimpleName().replace("StorageHandler", "").toUpperCase();
             log.info("[유형: {}]", type);
             storageHandlerMap.put(type, handler);
-
             log.info("StorageHandler 초기화가 완료되었습니다.");
         });
     }

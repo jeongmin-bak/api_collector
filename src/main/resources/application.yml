@@ -7,8 +7,8 @@ server:
 # 공통 경로 설정
 common:
   params:
-    extract_tmp_dir: ${EXTRACT_TMP_DIR}
-    meta_info_path: ${BATCH_META_FILE_PATH}
+    extract_tmp_dir: /test
+    meta_info_path: /test
 
 # agent 관련
 agent:
@@ -23,9 +23,9 @@ agent:
 
   batch:
     shell_scripts:
-      start_java_batch: ${BATCH_SCRIPT_PATH}/startJavaBatch.sh
-      start_proc_batch: ${BATCH_SCRIPT_PATH}/startProcBatch.sh
-      start_multi_batch: ${BATCH_SCRIPT_PATH}/startMultiBatch.sh
+      start_java_batch: /test/startJavaBatch.sh
+      start_proc_batch: /test/startProcBatch.sh
+      start_multi_batch: /test/startMultiBatch.sh
     paths:
       job_meta_file_path: ${common.params.meta_info_path}
     logs:

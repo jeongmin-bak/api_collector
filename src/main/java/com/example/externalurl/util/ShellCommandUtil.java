@@ -1,6 +1,5 @@
-package util;
+package com.example.externalurl.util;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -8,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Map;
 
-@Slf4j
 @Component
 public class ShellCommandUtil {
     @Value("${agent.batch.shell_scripts.start_java_batch}")
@@ -50,7 +48,6 @@ public class ShellCommandUtil {
 
             int exitCode = process.waitFor();
             if (exitCode != 0) {
-                log.error("쉘 명령어 실행 실패, 종료 코드: {}", exitCode);
                 throw new RuntimeException("Shell command failed with exit code: " + exitCode);
             }
             return returnedPid;
@@ -75,7 +72,6 @@ public class ShellCommandUtil {
                 command.append(javaBatchShellScript).append(" ");
                 break;
             default:
-                log.warn("알 수 없는 소스 유형: {}", srcType);
                 throw new IllegalArgumentException("Unknown source type: " + srcType);
         }
 
@@ -91,7 +87,6 @@ public class ShellCommandUtil {
             command.append(params.get("SRC_USE_TYPE")).append(" ");
         }
 
-        log.info("생성된 쉘 명령어: {}", command.toString().trim());
         return command.toString().trim();
     }
 
