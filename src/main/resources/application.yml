@@ -1,22 +1,44 @@
-#spring:
-#    datasource:
-#      hikari:
-#        url: jdbc:oracle:thin:@database02.didim365.co:1521:rwk
-#        username: batch_user
-#        password: fpemdnemzpdl123$
-##  mysql:
-##    datasource:
-##      hikari:
-##        driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-##        url: jdbc:log4jdbc:mysql://192.168.150.155:3306/didimdp_monimo?characterEncoding=UTF-8&useSSL=false&rewriteBatchedStatements=true
-##        username: didimdp_cloud
-##        password: fpemdnemzpdl123$
-#
-#mybatis:
-#  mapper-locations: classpath:mappers/**/*.xml
-#  config-location: classpath:mybatis-config.xml
-#
-#
-##      ## mybatis config ##
-##      mybatis.mapper-locations=classpath:mappers/**/*.xml
-##      mybatis.config-location=classpath:mybatis-config.xml
+server:
+  port: 9090
+  agent:
+    url: localhost
+    port: 8080
+
+# 공통 경로 설정
+common:
+  params:
+    extract_tmp_dir: ${EXTRACT_TMP_DIR}
+    meta_info_path: ${BATCH_META_FILE_PATH}
+
+# agent 관련
+agent:
+  execute:
+    cleanup_interval: 60000
+    job_check_interval: 5000
+    concurrent_job_count: 10
+    poll_interval: 3000
+    queue_size: 10
+    timeout: 10
+    connection_count: 100
+
+  batch:
+    shell_scripts:
+      start_java_batch: ${BATCH_SCRIPT_PATH}/startJavaBatch.sh
+      start_proc_batch: ${BATCH_SCRIPT_PATH}/startProcBatch.sh
+      start_multi_batch: ${BATCH_SCRIPT_PATH}/startMultiBatch.sh
+    paths:
+      job_meta_file_path: ${common.params.meta_info_path}
+    logs:
+      dir_path: ${LOG_DIR}
+
+spring:
+  application:
+    name: test-collector
+  datasource:
+    url: jdbc:oracle:thin:@database02.didim365.co:1521:rwk
+    username: batch_user
+    password: fpemdnemzpdl123$
+
+mybatis:
+  mapper-locations: classpath:mappers/**/*.xml
+  config-location: classpath:mybatis-config.xml

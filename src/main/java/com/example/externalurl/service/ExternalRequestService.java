@@ -1,6 +1,5 @@
 package com.example.externalurl.service;
 
-import com.example.externalurl.controller.ExternalRequestController;
 import com.example.externalurl.repository.ExternalRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
