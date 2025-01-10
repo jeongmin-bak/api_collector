@@ -7,8 +7,8 @@ server:
 # 공통 경로 설정
 common:
   params:
-    extract_tmp_dir: /Users/parkjungmin/Desktop/jungmin/external/externalUrl/src/main/resources/tmp
-    meta_info_path: /Users/parkjungmin/Desktop/jungmin/external/externalUrl/src/main/resources/json
+    extract_tmp_dir: /Users/parkjungmin/Desktop/external_url/api_dir/tmp
+    meta_info_path: /Users/parkjungmin/Desktop/external_url/api_dir
 
 # agent 관련
 agent:
@@ -38,6 +38,16 @@ spring:
     url: jdbc:oracle:thin:@database02.didim365.co:1521:rwk
     username: batch_user
     password: fpemdnemzpdl123$
+
+sub-db:
+  driver: oracle.jdbc.OracleDriver
+  url: jdbc:oracle:thin:@192.168.150.35:1521:RWK
+  username: didimdp
+  password: fpemdnemzpdl123$
+
+hikari:
+  connection-timeout: 1800000
+  max-lifetime: 1800000
 
 mybatis:
   mapper-locations: classpath:mappers/**/*.xml

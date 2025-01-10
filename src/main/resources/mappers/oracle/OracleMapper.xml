@@ -86,6 +86,8 @@
         SELECT
                A.API_ID
              , A.API_URL
+             , A.API_SVC
+             , A.API_URL
              , A.IS_QUERY
              , A.IS_PATH
              , A.DATA_FORMAT

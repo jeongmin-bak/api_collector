@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +57,17 @@ public class ExternalRequestController {
         LOGGER.info("Api Detail Info Select Method Call!");
         LOGGER.info("inputParameter : {}", inputParameter.toString());
         Map<String, Object> tmpMap = externalRequestService.selectApiDetailInfo(inputParameter);
-        LOGGER.info("result : {} ", tmpMap.toString());
         return tmpMap;
+    }
+
+    @GetMapping("/search/codegroup")
+    public Map<String, Object> searchCodeGroup(){
+        LOGGER.info("Search Code Group Start!!");
+        List<Map<String, Object>> codeGroup =  externalRequestService.getCodeGroup();
+        LOGGER.info("Url List : {}", codeGroup.stream().toList());
+        Map<String, Object> resultList = new HashMap<>();
+        resultList.put("resultList", codeGroup);
+
+        return resultList;
     }
 }

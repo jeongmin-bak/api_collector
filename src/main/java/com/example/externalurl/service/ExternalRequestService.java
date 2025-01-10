@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
@@ -19,11 +20,18 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class ExternalRequestService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalRequestService.class);
+
+    private final JdbcTemplate jdbcTemplate;
     @Autowired
     ExternalRepository externalRepository;
     public List<Map<String, Object>> getUrlList(){
         List<Map<String, Object>> resultList = externalRepository.getAllUrlList();
         LOGGER.info("result List : {}", resultList.stream().toList());
+        return resultList;
+    }
+
+    public List<Map<String, Object>> getCodeGroup(){
+        List<Map<String, Object>> resultList = externalRepository.getCodeGroup();
         return resultList;
     }
 
@@ -143,5 +151,9 @@ public class ExternalRequestService {
         }catch (Exception e){
             LOGGER.info(e.getMessage());
         }
+    }
+    private void searchCodeGroup(){
+        String selectStmt = "SELECT * FROM ";
+        jdbcTemplate.execute(selectStmt);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.externalurl.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +9,7 @@ import java.io.InputStreamReader;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class ShellCommandUtil {
     @Value("${agent.batch.shell_scripts.start_java_batch}")
     private String javaShellScript;
@@ -32,6 +34,7 @@ public class ShellCommandUtil {
      * 실제로 명령어를 실행하는 메서드
      */
     private long executeCommand(String command) throws Exception {
+        log.info("명령어 실행 executeCommand");
         ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
         processBuilder.redirectErrorStream(true);
         Process process = processBuilder.start();
@@ -41,6 +44,7 @@ public class ShellCommandUtil {
             StringBuilder output = new StringBuilder();
 
             while ((line = reader.readLine()) != null) {
+                log.info(line);
                 output.append(line);
             }
 

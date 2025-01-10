@@ -8,6 +8,7 @@ import java.util.Map;
 @Mapper
 public interface ExternalRepository {
     List<Map<String, Object>> getAllUrlList();
+    List<Map<String, Object>> getCodeGroup();
     String checkDuplicationUrl(String apiUrl);
     int insertApiJdbcInfo(Map<String, Object> jdbcInfo);
     int insertApiUrlInfo(Map<String, Object> apiUrlInfo);
