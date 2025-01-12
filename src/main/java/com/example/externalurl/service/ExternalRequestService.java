@@ -11,16 +11,18 @@ import org.springframework.stereotype.Service;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ExternalRequestService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalRequestService.class);
-
     private final JdbcTemplate jdbcTemplate;
     @Autowired
     ExternalRepository externalRepository;
@@ -56,9 +58,9 @@ public class ExternalRequestService {
         Boolean duplicationCheck = false;
         String selectResult = externalRepository.checkDuplicationUrl(apiUrl);
         if(selectResult == null || selectResult.length() == 0){
-            duplicationCheck = false;
+            duplicationCheck = true; // 등록가능
         }else{
-            duplicationCheck = true;
+            duplicationCheck = false;
         }
         return duplicationCheck;
     }
@@ -84,22 +86,40 @@ public class ExternalRequestService {
         Map<String, Object> apiInfoParam = new HashMap<>(){{
             put("API_ID", ApiKey);
             put("BASE_URL", inputParameter.get("baseUrl"));
+            put("API_JB_TYPE", ((List)inputParameter.get("API_JB_TYPE")).toString());
             put("API_SVC", inputParameter.get("API_SVC"));
             put("IS_QUERY", inputParameter.get("isQueryParam"));
             put("IS_PATH", inputParameter.get("isPathParam"));
             put("DATA_FORMAT", inputParameter.get("DATA_FORMAT"));
-            put("DATA_PV_GP", "01");
-            put("DATA_PROVIDER", inputParameter.get("DATA_PROVIDER"));
-            put("API_EXPL", "");
+            put("DATA_PV_GP", inputParameter.get("DATA_FORMAT"));
+            put("DATA_PROVIDER", getDataProvider((String)inputParameter.get("DATA_PROVIDER")));
+            put("API_EXPL", inputParameter.get("API_EXPL"));
             put("AUTH_KEY", inputParameter.get("AUTH_KEY"));
             put("AUTH_SECRET", inputParameter.get("AUTH_SECRET"));
             put("KEY_NAME", inputParameter.get("keyName"));
-            put("PAGE_COL_NM", "");
-            put("TC_COL_NM", "");
+            put("countKeyName", inputParameter.get("countKeyName"));
+            put("PAGE_COL_NM", inputParameter.get("PAGE_KEY"));
+            put("TC_COL_NM", inputParameter.get("TOTAL_CNT_KEY"));
             put("JDBC_ID", JdbcKey);
         }};
         LOGGER.info("apiInfoParam : {}", apiInfoParam);
         saveApiInfo(apiInfoParam);
+    }
+
+    private String getDataProvider(String codeId){
+        switch (codeId){
+            case "01":
+                return "국토교통부";
+            case "02":
+                return "통계정보서비스";
+            case "03":
+                return "한국부동산원";
+            case "04":
+                return "한국은행";
+            case "05":
+                return "한국주택금융공사";
+        }
+        return "";
     }
 
     public Map<String, Object> selectApiDetailInfo(Map<String, Object> apiInfoMap){
@@ -146,14 +166,10 @@ public class ExternalRequestService {
 
     private void saveApiInfo(Map<String, Object> apiMapParam){
         try{
-            LOGGER.info(apiMapParam.toString());
             externalRepository.insertApiUrlInfo(apiMapParam);
         }catch (Exception e){
             LOGGER.info(e.getMessage());
         }
     }
-    private void searchCodeGroup(){
-        String selectStmt = "SELECT * FROM ";
-        jdbcTemplate.execute(selectStmt);
-    }
+
 }

@@ -4,18 +4,19 @@
     <select id="getAllUrlList" resultType="java.util.HashMap">
         SELECT
                 API_ID
+              , JOB_ID
+              , API_URL
+              , API_JB_TYPE
+              , DATA_FORMAT
               , DATA_PV_GP
               , DATA_PROVIDER
-              , API_URL
-              , DATA_FORMAT
               , API_EXPL
+              , KEY_NAME
+              , countKeyName
+              , PAGE_COL_NM
+              , TC_COL_NM
         FROM RAWAPIINFO
         ORDER BY DATA_PROVIDER
---         SELECT DISTINCT DATA_PROVIDER,
---                         API_URL,
---                         DATA_FORMAT
---         FROM RAWAPIDATA
---         ORDER BY DATA_PROVIDER
     </select>
 
     <select id="checkDuplicationUrl" resultType="String">
@@ -49,6 +50,7 @@
         (
               API_ID
             , API_URL
+            , API_JB_TYPE
             , API_SVC
             , IS_QUERY
             , IS_PATH
@@ -59,6 +61,7 @@
             , USER_KEY
             , USER_AUTH
             , KEY_NAME
+            , countKeyName
             , PAGE_COL_NM
             , TC_COL_NM
             , JDBC_ID
@@ -66,6 +69,7 @@
         (
             #{API_ID},
             #{BASE_URL},
+            #{API_JB_TYPE},
             #{API_SVC},
             #{IS_QUERY},
             #{IS_PATH},
@@ -76,6 +80,7 @@
             #{AUTH_KEY},
             #{AUTH_SECRET},
             #{KEY_NAME},
+            #{countKeyName},
             #{PAGE_COL_NM},
             #{TC_COL_NM},
             #{JDBC_ID}
@@ -106,5 +111,11 @@
           AND A.API_ID = #{API_ID}
           AND A.API_URL = #{API_URL}
     </select>
+
+    <update id="updateJobId" parameterType="HashMap">
+        UPDATE RAWAPIINFO
+        SET JOB_ID = #{JOB_ID}
+        WHERE API_ID = #{API_ID}
+    </update>
 
 </mapper>

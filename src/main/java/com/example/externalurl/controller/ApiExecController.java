@@ -1,6 +1,8 @@
 package com.example.externalurl.controller;
 
+import com.example.externalurl.repository.ExternalRepository;
 import com.example.externalurl.service.DbStorageHandler;
+import com.example.externalurl.service.ExternalRequestService;
 import com.example.externalurl.service.StorageHandler;
 import com.example.externalurl.util.ShellCommandUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,15 +19,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
 @RequestMapping("/v1/api")
 @RequiredArgsConstructor
 public class ApiExecController {
+    private final ExternalRequestService externalRequestService;
+    private final ExternalRepository externalRepository;
     private final ObjectMapper objectMapper;
     private final ApplicationContext applicationContext;
     private final ShellCommandUtil shellCommandUtil;
@@ -54,17 +62,20 @@ public class ApiExecController {
     @PostMapping("/execute/api/collector")
     public void executeApiJob(@RequestBody Map<String, Object> request){
         log.info("Agent Api Collect Start");
+        request = AddJobInfo(request);
         try {
             log.info("api url - 수신 데이터 : {}", request);
             log.info("작업 ID: {}, 작업 날짜: {}", request.get("JB_ID"), request.get("JB_DT"));
 
             LinkedHashMap<String, Object> makeParamMap = makeJsonParam(request);
             String saveResult = createJsonApiFile(makeParamMap);
+
             if(saveResult.equals("success")){
                 // 커멘드 작업을 시작합니다.
                 String command = buildShellCommand(request);
-                long pid = shellCommandUtil.runShellCommand(command);
-                log.info("작업 PID : {}", pid);
+                log.info("실행 쉘 명령어 : {}", command);
+                //long pid = shellCommandUtil.runShellCommand(command);
+                //log.info("작업 PID : {}", pid);
             }
         } catch (Exception e) {
             log.error("Api 외부 데이터 수집 실패 : {}", e.getMessage());
@@ -101,6 +112,7 @@ public class ApiExecController {
         tmpMap.put("isPathParam", userParamMap.get("IS_PATH"));
         tmpMap.put("isQueryParam", userParamMap.get("IS_QUERY"));
         tmpMap.put("keyName", userParamMap.get("KEY_NAME"));
+        tmpMap.put("countKeyName", userParamMap.get("COUNTKEYNAME"));
         tmpMap.put("returnType", userParamMap.get("DATA_FORMAT"));
         tmpMap.put("DATA_PROVIDER", userParamMap.get("DATA_PROVIDER"));
         tmpMap.put("JDBC_ID", userParamMap.get("JDBC_ID"));
@@ -129,5 +141,39 @@ public class ApiExecController {
 
         log.info("생성된 쉘 명령어: {}", command.toString().trim());
         return command.toString().trim();
+    }
+
+    private Map<String, Object> AddJobInfo(Map<String, Object> userParamMap){
+        LocalDate now = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        //JB_DT 생성
+        String jbDt = now.format(formatter);
+
+        // API -> JOB_ID DB insert
+        if(userParamMap.get("JOB_ID") == null){
+            //JB_ID 생성
+            String jbId = "JOB"+ jbDt + randomJobId();
+
+            Map<String, Object> updateParam = new HashMap<>();
+            updateParam.put("API_ID", userParamMap.get("API_ID"));
+            updateParam.put("JOB_ID", jbId);
+            externalRepository.updateJobId(updateParam);
+            log.info("작업 ID update 완료");
+
+            userParamMap.put("JB_DT", jbDt);
+            userParamMap.put("JB_ID", jbId);
+        } else {
+            log.info("기존 작업 ID가 존재합니다.");
+        }
+
+        return userParamMap;
+    }
+
+    private String randomJobId(){
+        String str = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+        return new Random().ints(8, 0, str.length())
+                .mapToObj(i -> String.valueOf(str.charAt(i)))
+                .collect(Collectors.joining());
     }
 }
