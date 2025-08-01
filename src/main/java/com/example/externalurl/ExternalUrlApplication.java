@@ -97,6 +97,20 @@ public class ExternalUrlApplication implements CommandLineRunner{
         log.info("외부데이터 수집 완료");
     }
 
-    
+    @PreDestroy
+    public void shutdownExecutor() {
+        executorService.shutdown();
+        try {
+            if(!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+        log.info("외부데이터 수집 리소스 정리 완료");
+    }
+
+
 
 }
