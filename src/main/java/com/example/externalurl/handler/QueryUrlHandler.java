@@ -7,6 +7,7 @@ public class QueryUrlHandler extends AbstractUrlHandler {
     @Override
     protected Map<String, Object> executeJob(Map<String, Object> urlParam, Map<String, Object> metaInfo) {
         String apiSvc = (String) metaInfo.get("API_SVC");
+        String apiUrl = (String) metaInfo.get("API_URL");
         String dataFormat = (String) metaInfo.get("DATA_FORMAT");
         String pageCol = (String) metaInfo.get("PAGE_COL");
         String keyName = (String) metaInfo.get("KEY_NAME");
@@ -33,6 +34,7 @@ public class QueryUrlHandler extends AbstractUrlHandler {
         }
 
         if (fetchApiData.isEmpty() || fetchApiData.isBlank()) {
+            log.info("fetchApiData is Empty!");
             return null;
         }
 
@@ -61,14 +63,17 @@ public class QueryUrlHandler extends AbstractUrlHandler {
                     if (isJson) {
                         dataList = ParseJson.response(fetchApiData);
                     } else {
+                        log.info("xml 형식으로 처리합니다.");
                         throw new RuntimeException("처리할 수 없는 응답 형식입니다.");
                     }
                 
                 }
+                log.info("dataList : {}", dataList);
                 List<Map<String, Object>> dataInfo = dataList.stream().map(rowData -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("API_URL", baseUrl);
                     map.put("ROW_DATA", rowData);
+                    return map;
                }).toList();
                result.put("B_RESP", dataInfo);
             }
