@@ -69,6 +69,7 @@ public class ExternalUrlApplication implements CommandLineRunner{
                 try {
                     log.info("500번이상 요청되어 5초간 대기 후 요청진행합니다.");
                     Thread.sleep(5000);
+                    futures.add(CompletableFuture.runAsync(() -> urlHandler.handle(apiParam.get(index), metaInfo), executorService);
                 } catch(InterruptedException e) {
                     log.error(e.getMessage());
                 }
