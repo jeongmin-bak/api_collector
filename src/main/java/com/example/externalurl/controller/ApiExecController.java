@@ -86,6 +86,34 @@ public class ApiExecController {
                     }
                 });
                 log.info("외부데이터 작업 메타 정보 : {}", jobParams);
+
+                long pid;
+                String filesystem = (String) requestParam.get("SRC_TYPE");
+                String srcUseType = (String) requestParam.get("SRC_USE_TYPE");
+                String conCnt = String.valueOf(requestParam.get("CON_CNT"));
+                Map<String, Object> jobInfo = new HashMap<>();
+                jobInfo.put("SRC_TYPE", filesystem);
+                jobInfo.put("SRC_USE_TYPE", srcUseType);
+                jobInfo.put("CON_CNT", conCnt);
+
+                try {
+                    String filePath = jsonFilePath + "/api_unload_" + jobParams.get("JB_ID") + ".json";
+                    Path path = Paths.get(filePath);
+                    
+
+                } catch (Exception e) {
+                    log.error("외부데이터 수집 작업 메타 정보 처리 중 오류 발생: {}", e.getMesage(), e);
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                    Map<String, Object> payload = new HashMap<>();
+                    payload.put("JB_ID", reqeustParam.get("JB_ID").toString());
+                    payload.put("EXE_STSC", 99);
+                    payload.put("EXE_JB_RNG", "02");
+                    payload.put("ERR_LOG", "배치 작업 준비에 실패했습니다: " + e.getMessage());
+                    HttpEntity<Map<String, Object>> responseEntity = new HttpEntity<>(payload, headers);
+                    String restUrl = discoveryReConnectUtil.restConnectWithRetryManager() + "/dp/external/status/update";
+                    restTemplate.postForEntity(restUrl, responseEntity, Void.class);
+                }
             }
 
         } catch (Exception e) {
@@ -98,7 +126,7 @@ public class ApiExecController {
 
 
 
-    
+
     @PostMapping("/execute/api/collector")
     public void executeApiJob(@RequestBody Map<String, Object> request){
         log.info("Agent Api Collect Start");
