@@ -29,36 +29,76 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequestMapping("/v1/api")
+@RequestMapping("/v1/batch/external")
 @RequiredArgsConstructor
 public class ApiExecController {
-    private final ExternalRequestService externalRequestService;
-    private final ExternalRepository externalRepository;
-    private final ObjectMapper objectMapper;
-    private final ApplicationContext applicationContext;
-    private final ShellCommandUtil shellCommandUtil;
-    private final Map<String, StorageHandler> storageHandlerMap = new HashMap<>();
 
-    @Value("10")
-    private int concurrentJobCount;
-    private String restUrl;
+    private final ObjectMapper objectMapper;
+    private final RestTemplate restTemplate;
+    private final DiscoveryReConnectUtil discoveryReConnectUtil;
+    private final ShellCommandUtil shellCommandUtil;
+    private final QueueManager queueManager;
+
+    @Value("${common.params.extract_tmp_dir}")
+    protected String tmpDataDir;
 
     @Value("${agent.batch.paths.job_meta_file_path}")
     private String jsonFilePath;
 
+    @Value("${agent.batch.shell_scripts.start_api_batch}")
+    private String javaShellScript;
+
+    @Value("${server.agent.url}")
+    private String agentUrl;
+
+    @Value("${server.agent.port}")
+    private String agentPort;
+
     @PostConstruct
     public void init(){
-        Map<String, StorageHandler> handlers = applicationContext.getBeansOfType(StorageHandler.class);
-        log.info("handlers : {}", handlers.toString());
-        handlers.forEach((name, handler) -> {
-            log.info("[이름: {}, 핸들러: {}]", name, handler);
-            String type = handler.getClass().getSimpleName().replace("StorageHandler", "").toUpperCase();
-            log.info("[유형: {}]", type);
-            storageHandlerMap.put(type, handler);
-            log.info("StorageHandler 초기화가 완료되었습니다.");
-        });
+        log.info("BatchExternalController 초기화가 완료되었습니다.");
     }
 
+    @PostMapping("/execute")
+    public void executeBatchJob(@RequestBody Map<String, Object> request){
+        String jobId = null;
+        try {
+            String rstJson = (String) request.get("RST");
+            log.info("외부데이터 수집 작업 요청 수신 - 요청 데이터: {}", request);
+
+            Map<String, Object> requestParam = objectMapper.readValue(rstJson, new TypeReference<> {
+            });
+
+            synchronized (this) {
+                jobId = requestParam.get("JB_ID").toString();
+                jbDt = requestParam.get("JB_DT").toString();
+                log.info("동시 작업 허용 개수 내에서 작업을 처리합니다. 작업 ID: {}", jobId);
+                log.info("외부데이터 작업 요청처리 시작");
+
+                Map<String, Object> jobParams = new HashMap<>();
+                requestParam.forEach((key, value) -> {
+                    if (value instanceof Map<?, ?>) {
+                        ((Map<?, ?> value).forEach((innerKey, innerValue) -> {
+                            jobParams.put(innerKey.toString(), innerValue);
+                        })
+                    } else {
+                        jobParams.put(key, value);
+                    }
+                });
+                log.info("외부데이터 작업 메타 정보 : {}", jobParams);
+            }
+
+        } catch (Exception e) {
+            String errorMessage = "요청 처리 중 오류가 발생했습니다. 상세 정보: " + e.getMessage() + ". 관리자에게 문의하세요.";
+            log.error("요청 처리 중 예외 발생 : {}", e.getMessage());
+            this.sendErrorStatus(jobId, "01", errorMessage);
+        }
+
+    }
+
+
+
+    
     @PostMapping("/execute/api/collector")
     public void executeApiJob(@RequestBody Map<String, Object> request){
         log.info("Agent Api Collect Start");
