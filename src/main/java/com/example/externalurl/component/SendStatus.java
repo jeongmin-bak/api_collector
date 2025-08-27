@@ -1,3 +1,15 @@
+package com.example.externalurl.component;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -69,7 +81,7 @@ public class SendStatus {
         log.info("외부데이터 수집 작업 자원정리 요청 신호 전송");
         try {
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(payload, headers);
-            restTemplate.postForEntity(restUrl, reqeustEntity, Void.class);
+            restTemplate.postForEntity(restUrl, requestEntity, Void.class);
         } catch (Exception e) {
             log.error("{}로 리소스 해제 요청 전송 실패: {}", restUrl, e.getMessage());
         }
