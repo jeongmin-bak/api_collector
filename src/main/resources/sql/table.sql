@@ -47,4 +47,34 @@ create table API_CD_BAS (
     CD_EXPL     VARCHAR2(500) not null,
     constraint PK_API_CD_BAS
         primary key (CD_GRP_ID, CD_ID, CD_EXPL)
+);
+
+create table SWCDITBFAD001 (
+    FRG_BUR_C   varchar(3) not null, -- 대외기관코드
+    SV_NM       varchar(150) not null, --  서비스명
+    OTSD_LINK_URL varchar(1000) not null, -- 외부링크URL
+    LNK_DTA_DRM_ID varchar(150) not null, -- 연동데이터식별ID 서비스명+UUID
+    FRG_IF_BUR_NM   varchar(100) not null, -- 대외인터페이스기관명
+    API_DFNTN_CN    varchar(1000) not null, -- API정의내용
+    API_RSP_CN      CLOB    not null, -- API응답내용
+    COL_DTA_TP_NM   varchar(15) not null, -- 컬럼데이터유형명(데이터포맷)
+    BSDT    varchar(8) not null, -- 기준일자
+    LDNG_TS timestamp -- 적재일자
+    constraint PK_SWCDITBFAD002
+        primary key (FRG_BUR_C, SV_NM, OTSD_LINK_URL, LNK_DTA_DRM_ID)
+);
+
+create table SWCDITBFAD002 (
+    FRG_BUR_C   varchar(3) not null, -- 대외기관코드
+    SV_NM       varchar(150) not null, --  서비스명
+    OTSD_LINK_URL varchar(1000) not null, -- 외부링크URL
+    LNK_DTA_DRM_ID varchar(150) not null, -- 연동데이터식별ID
+    FRG_IF_BUR_NM   varchar(100) not null, -- 대외인터페이스기관명
+    API_DFNTN_CN    varchar(1000) not null, -- API정의내용
+    API_RSP_CN      CLOB    not null, -- API응답내용
+    COL_DTA_TP_NM   varchar(15) not null, -- 컬럼데이터유형명
+    BSDT    varchar(8) not null, -- 기준일자
+    LDNG_TS timestamp -- 적재일자
+    constraint PK_SWCDITBFAD002
+        primary key (FRG_BUR_C, SV_NM, OTSD_LINK_URL, LNK_DTA_DRM_ID)
 )
