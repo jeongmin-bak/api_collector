@@ -14,11 +14,13 @@ public class DateUtil {
     }
 
     public static String changeBasicDateToStrDate(String basicDateFormat, String inputDate) {
+        // 반기, 분기, 반월처리 함수
         int yyyy = Integer.parseInt(inputDate.substring(0,4));
         int mm = Integer.parseInt(inputDate.substring(4,6));
         int dd = 0;
         String resDate = String.valueOf(yyyy);
 
+        // S, Q, SM 타입인지 타입을 뽑아낸다.
         Pattern pattern = Pattern.compile("\\d{4}(\\S{1,2})(\\d{1})");
         Matcher matcher = pattern.matcher(basicDateFormat);
         String type = "";
@@ -104,7 +106,6 @@ public class DateUtil {
                 throw new IllegalArgumentException("지원하지 않는 Temporal 타입");
             }
         }
-
 
         public static String format(Temporal date, String pattern) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
