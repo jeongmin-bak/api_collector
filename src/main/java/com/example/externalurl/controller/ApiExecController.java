@@ -1,31 +1,25 @@
 package com.example.externalurl.controller;
 
-import com.example.externalurl.repository.ExternalRepository;
-import com.example.externalurl.service.DbStorageHandler;
-import com.example.externalurl.service.ExternalRequestService;
-import com.example.externalurl.service.StorageHandler;
 import com.example.externalurl.util.ShellCommandUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.annotation.PostConstruct;
-import job.Task;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -62,11 +56,12 @@ public class ApiExecController {
     @PostMapping("/execute")
     public void executeBatchJob(@RequestBody Map<String, Object> request){
         String jobId = null;
+        String jbDt = null;
         try {
             String rstJson = (String) request.get("RST");
             log.info("외부데이터 수집 작업 요청 수신 - 요청 데이터: {}", request);
 
-            Map<String, Object> requestParam = objectMapper.readValue(rstJson, new TypeReference<> {
+            Map<String, Object> requestParam = objectMapper.readValue(rstJson, new TypeReference<>() {
             });
 
             synchronized (this) {
@@ -78,7 +73,7 @@ public class ApiExecController {
                 Map<String, Object> jobParams = new HashMap<>();
                 requestParam.forEach((key, value) -> {
                     if (value instanceof Map<?, ?>) {
-                        ((Map<?, ?> value).forEach((innerKey, innerValue) -> {
+                        ((Map<?, ?> value.forEach((innerKey, innerValue) -> {
                             jobParams.put(innerKey.toString(), innerValue);
                         })
                     } else {
@@ -102,11 +97,11 @@ public class ApiExecController {
                     
 
                 } catch (Exception e) {
-                    log.error("외부데이터 수집 작업 메타 정보 처리 중 오류 발생: {}", e.getMesage(), e);
+                    log.error("외부데이터 수집 작업 메타 정보 처리 중 오류 발생: {}", e.getMessage(), e);
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.APPLICATION_JSON);
                     Map<String, Object> payload = new HashMap<>();
-                    payload.put("JB_ID", reqeustParam.get("JB_ID").toString());
+                    payload.put("JB_ID", requestParam.get("JB_ID").toString());
                     payload.put("EXE_STSC", 99);
                     payload.put("EXE_JB_RNG", "02");
                     payload.put("ERR_LOG", "배치 작업 준비에 실패했습니다: " + e.getMessage());
@@ -225,7 +220,6 @@ public class ApiExecController {
             Map<String, Object> updateParam = new HashMap<>();
             updateParam.put("API_ID", userParamMap.get("API_ID"));
             updateParam.put("JOB_ID", jbId);
-            externalRepository.updateJobId(updateParam);
             log.info("작업 ID update 완료");
 
             userParamMap.put("JB_DT", jbDt);

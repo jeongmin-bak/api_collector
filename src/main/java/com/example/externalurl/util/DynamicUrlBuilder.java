@@ -1,19 +1,18 @@
 package com.example.externalurl.util;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.util.UriComponentsBuilder;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class DynamicUrlBuilder {
-    /**
-     * Meta 정보를 기반으로 URL 생성
-     *
-     * @param baseUrl     기본 URL
-     * @param pathParams  Path Parameter 리스트
-     * @param queryParams Query Parameter 맵
-     * @return 동적으로 생성된 URL
-     */
+    public static String buildUrl(String apiUrl, Map<String, Object> urlParam, boolean isPath, String reqUrlType, Map<String, Object> bsInfoMap) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(apiUrl);
+    }
     public static String buildUrl(String baseUrl, List<String> pathParams, Map<String, String> queryParams){
         StringBuilder urlBuilder = new StringBuilder(baseUrl);
 

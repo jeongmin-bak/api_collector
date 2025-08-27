@@ -1,3 +1,14 @@
+package com.example.externalurl.util;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.util.*;
+
 @Slf4j
 public class ParseJson {
     static ObjectMapper objectMapper = new ObjectMapper();
@@ -10,7 +21,7 @@ public class ParseJson {
             throw new RuntimeException(e);
         }
 
-        if (rootNode.has("SttsApiTblData") || rootNode.has("SttsApiTbl") || rootNode.has("StanReginCd") {
+        if (rootNode.has("SttsApiTblData") || rootNode.has("SttsApiTbl") || rootNode.has("StanReginCd")) {
             JsonNode totalCountKey = getListTotalCountKey(rootNode, keyName);
             return totalCountKey.asInt();
         } else {
@@ -40,12 +51,13 @@ public class ParseJson {
             Object tmpObject = mapper.readValue(jsonResponse, Object.class);
             if(tmpObject instanceof List) {
                 List<Map<String, Object>> tmpList = mapper.readValue(jsonResponse, new TypeReference<List<Map<String, Object>>>() {});
-                for (Map<String, Object) itemMap : tmpList) {
+                for (Map<String, Object> itemMap : tmpList) {
+                    log.info("itemMap {}", itemMap);
                     if(itemMap.containsKey(keyName)) {
                         Object childNode = itemMap.get(keyName);
                         if(childNode instanceof Map) {
-                            dataList = new ArrayList<> {{
-                                add((Map<String, Object) childNode);
+                            dataList = new ArrayList<>() {{
+                                add((Map<String, Object>) childNode);
                             }};
                         } else {
                             dataList = (List)childNode;
@@ -82,7 +94,7 @@ public class ParseJson {
                         JsonNode targetNode = searchNestedKey(rootNode, keyName);
                         if (targetNode != null) {
                             if (targetNode.isArray()) {
-                                for (JsonNode fieldName : targetNode) {
+                                for (JsonNode fieldNode : targetNode) {
                                     Map<String, Object> fieldMap = objectMapper.convertValue(fieldNode, Map.class);
                                     dataList.add(fieldMap);
                                 }
@@ -115,7 +127,7 @@ public class ParseJson {
             }
             return targetNode;
         }
-        for (Iterator<Map.Entry<String, JsonNode>> it = rootNoode.fields(); it.hasNext(); ) {
+        for (Iterator<Map.Entry<String, JsonNode>> it = rootNode.fields(); it.hasNext(); ) {
             Map.Entry<String, JsonNode> entry = it.next();
             JsonNode childNode = entry.getValue();
             if (childNode.isObject()) {
@@ -132,7 +144,7 @@ public class ParseJson {
         if (rootNode.has("SttsApiTblData") || rootNode.has("SttsApiTbl") || rootNode.has("StanReginCd")) {
             JsonNode apiTbl;
             if (rootNode.has("SttsApiTblData")) {
-                apipTbl = rootNode.get("SttsApiTblData");
+                apiTbl = rootNode.get("SttsApiTblData");
             } else if (rootNode.has("SttsApiTbl")) {
                 apiTbl = rootNode.get("SttsApiTbl");
             } else {

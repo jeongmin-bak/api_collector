@@ -1,6 +1,10 @@
+package com.example.externalurl.handler;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
-@Componet
+@Component
 public class PathUrlHandler extends AbstractUrlHandler {
     public PathUrlHandler(RawApiDataLoader apiDataLoader) { super(apiDataLoader); }
 

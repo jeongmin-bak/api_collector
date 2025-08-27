@@ -1,6 +1,17 @@
+package com.example.externalurl.handler;
+
+import com.example.externalurl.component.RawApiDataLoader;
+import com.example.externalurl.util.DynamicUrlBuilder;
+import com.example.externalurl.util.FetchApi;
+import com.example.externalurl.util.ParseJson;
+import com.example.externalurl.util.ParseXml;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Slf4j
-@Componet
+@Component
 public class QueryUrlHandler extends AbstractUrlHandler {
     public QueryUrlHandler(RawApiDataLoader apiDataLoader) { super(apiDataLoader); }
 
@@ -42,13 +53,13 @@ public class QueryUrlHandler extends AbstractUrlHandler {
 
         int totalCnt;
         if (!cntKey.isEmpty() && !cntKey.isBlank()) {
-            totalCnt = isJson ? ParseJson.responseTotalCount(fetchApiData, cntKey) : ParseXml.responseTotalCount(fetchApiData, cntKey);
+            totalCnt = isJson ? ParseJson.responseTotalCount(fetchApiData, cntKey) : ParseXml.reponseTotalCount(fetchApiData, cntKey);
             log.info("수집 대상 데이터 개수 : {}", totalCnt);
         } else {
             totalCnt = 0;
         }
 
-        if (lapiSvc.contains("Lease") && totalCnt == 0) {
+        if (apiSvc.contains("Lease") && totalCnt == 0) {
             log.info("수집개수 0으로 수집 종료");
             return null;
         }

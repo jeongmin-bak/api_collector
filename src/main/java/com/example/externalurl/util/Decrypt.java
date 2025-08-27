@@ -1,3 +1,8 @@
+package com.example.externalurl.util;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.*;
 
 public class Decrypt {
     public static String decrypt(String encryptedText, String key) {
@@ -5,13 +10,13 @@ public class Decrypt {
         final String base64str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         String hashKey;
         Map<Character, Integer> base64map = new HashMap<>();
-        StringBuilder palinText = new StringBuilder();
+        StringBuilder plainText = new StringBuilder();
 
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
-            if(key.isEmpth()) hashKey = bytesToHex(digest.digest(defaultKey.getBytes(StandardCharsets.UTF-8)));
-            else hashKey = bytesToHex(digest.digest(key,getBytes(StandardCharsets.UTF-8)));
+            if(key.isEmpty()) hashKey = bytesToHex(digest.digest(defaultKey.getBytes(StandardCharsets.UTF_8)));
+            else hashKey = bytesToHex(digest.digest(key.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
             return "";
         }
@@ -20,7 +25,7 @@ public class Decrypt {
 
         for (int i = 0; i < encryptedText.length(); i++) {
             int keyIdx = i % hashKey.length();
-            char orgChar = encryptedText.charAt(i);
+            char origChar = encryptedText.charAt(i);
             char keyChar = hashKey.charAt(keyIdx);
 
             if (base64map.get(origChar) != null) {
@@ -38,7 +43,7 @@ public class Decrypt {
     private static String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
-            sb.append(String.format("%02x", b))
+            sb.append(String.format("%02x", b));
         }
         return sb.toString();
     }

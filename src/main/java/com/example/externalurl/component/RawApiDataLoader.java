@@ -1,11 +1,20 @@
+package com.example.externalurl.component;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.sql.Types;
+
 @Slf4j
 @Repository
 @RequiredArgsConstructor
 public class RawApiDataLoader {
     private final JdbcTemplate jdbcTemplate;
 
-    public void deleteRawApiData(String apiUrl, String jdDt) {
-        Sting deleteStmt = "DELETE FROM SWCDITBFAD001 WHERE OTSD_LINK_URL = ? AND BSDT = ?";
+    public void deleteRawApiData(String apiUrl, String jbDt) {
+        String deleteStmt = "DELETE FROM SWCDITBFAD001 WHERE OTSD_LINK_URL = ? AND BSDT = ?";
         jdbcTemplate.update(deleteStmt, apiUrl, jbDt);
     
     }
@@ -34,7 +43,6 @@ public class RawApiDataLoader {
         String sql = "INSERT INTO SWCDITBFAD002 (FRG_BUR_C, SV_NM, OTST_LINK_URL, LNK_DTA_DRM_ID, FRG_IF_BUR_NM, API_DFNTN_CN, API_RSP_CN, COL_DTA_TP_NM, BSDT, LDNG_TS)" +
                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        bodyData = (bodyData == null) ? "" : bodyData;
         try {
             jdbcTemplate.update(sql,
                     new Object[]{dataPvGp, apiSvc, apiUrl, apiSn, dataProvider, apiExpl, responseData, dataFormat, bsDt, jbDt},

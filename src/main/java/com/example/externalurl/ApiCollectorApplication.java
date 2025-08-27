@@ -1,15 +1,36 @@
 package com.example.externalurl;
 
-import org.springframework.boot.SpringApplication;
+import com.example.externalurl.component.SendStatus;
+import com.example.externalurl.handler.PathUrlHandler;
+import com.example.externalurl.handler.UrlHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PreDestroy;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @SpringBootApplication
 @RequiredArgsConstructor
-public class ExternalUrlApplication implements CommandLineRunner{
+public class ExternalUrlApplication implements CommandLineRunner {
 
-    private final ObjectMaper objectMapper;
+    private final ObjectMapper objectMapper;
     private final ApplicationContext context;
     private final SendStatus sendStatus;
 
@@ -21,7 +42,7 @@ public class ExternalUrlApplication implements CommandLineRunner{
     public static void main(String[] args) {
         ConfigurableApplicationContext context = new SpringApplicationBuilder(ExternalUrlApplication.class)
                             .web(WebApplicationType.NONE)
-                            .run(args)
+                            .run(args);
         SpringApplication.exit(context, () -> 0);
         SpringApplication.run(ExternalUrlApplication.class, args);
     }
@@ -84,7 +105,7 @@ public class ExternalUrlApplication implements CommandLineRunner{
         //});
 
         CompletableFuture<Void> allDoneFuture =
-                CompletableFuture.allOf(futures.toArrray(new CompletableFuture[0]));
+                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
         allDoneFuture
             .thenRun(() -> {
                 log.info("모든 작업 성공");

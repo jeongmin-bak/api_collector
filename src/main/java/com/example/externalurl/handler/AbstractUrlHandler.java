@@ -1,3 +1,20 @@
+package com.example.externalurl.handler;
+
+import com.example.externalurl.component.RawApiDataLoader;
+import com.example.externalurl.util.DynamicUrlBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -32,7 +49,7 @@ public abstract class AbstractUrlHandler implements UrlHandler {
         String baseUrl = DynamicUrlBuilder.builderUrl(apiUrl, urlParam, isPath, reqUrlType, bsInfoMap);
         log.info("baseUrl : {}", baseUrl);
 
-        Map<String, Obejct> apiData = executeJob(urlParam, metaInfo);
+        Map<String, Object> apiData = executeJob(urlParam, metaInfo);
 
         if(apiData == null || apiData.isEmpty()) {
             log.info("fetchApiData is null");

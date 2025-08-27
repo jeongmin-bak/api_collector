@@ -1,3 +1,17 @@
+package com.example.externalurl.util;
+
+import lombok.extern.slf4j.Slf4j;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.*;
+
 @Slf4j
 public class ParseXml {
     public static int reponseTotalCount(String xmlResponse, String tagName) {
@@ -87,6 +101,7 @@ public class ParseXml {
                         rowData.put(columnName, value.isEmpty() ? null : value);
                     }
                 }
+                dataList.add(rowData);
             }
         }
         return dataList;
