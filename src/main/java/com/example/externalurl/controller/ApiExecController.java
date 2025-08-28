@@ -73,9 +73,9 @@ public class ApiExecController {
                 Map<String, Object> jobParams = new HashMap<>();
                 requestParam.forEach((key, value) -> {
                     if (value instanceof Map<?, ?>) {
-                        ((Map<?, ?> value.forEach((innerKey, innerValue) -> {
+                        ((Map<?, ?> value).forEach((innerKey, innerValue) -> {
                             jobParams.put(innerKey.toString(), innerValue);
-                        })
+                        });
                     } else {
                         jobParams.put(key, value);
                     }
@@ -94,8 +94,18 @@ public class ApiExecController {
                 try {
                     String filePath = jsonFilePath + "/api_unload_" + jobParams.get("JB_ID") + ".json";
                     Path path = Paths.get(filePath);
-                    
-
+                    if (Files.isSymbolicLink(path.getParent())) {
+                        path = path.getParent().toRealPath();
+                        filePath = path + "/api_unload_" + jobParams.get("JB_ID") + ".json";
+                    }
+                    if (!Files.exists(path.getParent())) {
+                        Files.createDirectories(path.getParent());
+                    }
+                    objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+                    objectMapper.writeValue(new File(filePath), jobParams);
+                    log.info("외부데이터 작업을 위한 JSON 파일이 성공적으로 생성되었습니다. 파일 경로: {}", filePath);
+                    jobInfo.put("JSON_FILE_NAEM", filePath);
+                    jobInfo.put("TMP_DIR", tmpDataDir + "/extract/" + jobId);
                 } catch (Exception e) {
                     log.error("외부데이터 수집 작업 메타 정보 처리 중 오류 발생: {}", e.getMessage(), e);
                     HttpHeaders headers = new HttpHeaders();
