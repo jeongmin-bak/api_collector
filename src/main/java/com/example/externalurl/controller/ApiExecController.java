@@ -14,12 +14,16 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -69,11 +73,10 @@ public class ApiExecController {
                 jbDt = requestParam.get("JB_DT").toString();
                 log.info("동시 작업 허용 개수 내에서 작업을 처리합니다. 작업 ID: {}", jobId);
                 log.info("외부데이터 작업 요청처리 시작");
-
                 Map<String, Object> jobParams = new HashMap<>();
                 requestParam.forEach((key, value) -> {
                     if (value instanceof Map<?, ?>) {
-                        ((Map<?, ?> value).forEach((innerKey, innerValue) -> {
+                        ((Map< ?,? >) value).forEach((innerKey, innerValue) -> {
                             jobParams.put(innerKey.toString(), innerValue);
                         });
                     } else {
@@ -112,25 +115,122 @@ public class ApiExecController {
                     headers.setContentType(MediaType.APPLICATION_JSON);
                     Map<String, Object> payload = new HashMap<>();
                     payload.put("JB_ID", requestParam.get("JB_ID").toString());
-                    payload.put("EXE_STSC", 99);
+                    payload.put("EXE_STSC", "99");
                     payload.put("EXE_JB_RNG", "02");
                     payload.put("ERR_LOG", "배치 작업 준비에 실패했습니다: " + e.getMessage());
                     HttpEntity<Map<String, Object>> responseEntity = new HttpEntity<>(payload, headers);
-                    String restUrl = discoveryReConnectUtil.restConnectWithRetryManager() + "/dp/external/status/update";
+                    //String restUrl = discoveryReConnectUtil.restConnectWithRetryManager() + "/dp/external/status/update";
+                    String restUrl = "{managerURL}" + "/dp/external/status/update";
                     restTemplate.postForEntity(restUrl, responseEntity, Void.class);
                 }
-            }
 
+                String command = javaShellScript + " " + jobId + " " + jbDt;
+                log.info("외부데이터 수집 작업 실행 명령어 : {}", command);
+                ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
+                processBuilder.redirectErrorStream(true);
+                Process process = processBuilder.start();
+
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                    String line;
+                    StringBuilder output = new StringBuilder();
+
+                    while ((line = reader.readLine()) != null) {
+                        output.append(line);
+                    }
+                    pid = Long.parseLong(output.toString().trim());
+                    log.info("returnPid : {}", pid);
+                    JobManager.registerJob(jobId, pid, "01", jobInfo);
+                    log.info("해당 pid가 JobManager에 등록되었습니다. : {}", pid);
+                    int exitCode = process.waitFor();
+                    if (exitCode != 0) {
+                        log.error("쉘 명령어 실행 실패, 종료 코드 : {}", exitCode);
+                        throw new RuntimeException("Shell command failed with exit code: " + exitCode);
+                    }
+                }
+                Optional<ProcessHandle> runProcess = ProcessHandle.of(pid);
+                if (runProcess.isEmpty()) {
+                    log.warn("작업 실행이 실패 했습니다. 작업 ID : {}", jobId);
+                    this.sendErrorStatus(jobId, srcUseType, "작업 실행이 실패 했습니다.");
+                    return;
+                }
+                long startTime = System.currentTimeMillis();
+                long timeout = 30000; // 30초 타임아웃
+                boolean processStarted = false;
+
+                while (System.currentTimeMillis() - startTime < timeout) {
+                    if (runProcess.get().isAlive()) {
+                        processStarted = true;
+                        break;
+                    }
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e ){
+                        log.warn("프로세스 상태 확인 중 인터럽트 발생 ", e);
+                        this.sendErrorStatus(jobId, srcUseType, "프로세스 상태 확인 중 인터럽트 발생 " + e.getMessage());
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                    log.debug("프로세스 시작 대기 중 ... 작업 ID : {}, PID : {}", jobId, pid);
+                }
+                if (processStarted) {
+                    log.info("작업이 성공적으로 시작되었습니다. 작업 ID : {}, PID : {}", jobId, pid);
+                } else {
+                    log.error("작업 시작 실패 또는 타임아웃. 작업 ID : {}, PID : {}", jobId, pid);
+                    this.sendErrorStatus(jobId, srcUseType, "작업 시작 실패 또는 타임아웃");
+                }
+            }
         } catch (Exception e) {
             String errorMessage = "요청 처리 중 오류가 발생했습니다. 상세 정보: " + e.getMessage() + ". 관리자에게 문의하세요.";
             log.error("요청 처리 중 예외 발생 : {}", e.getMessage());
             this.sendErrorStatus(jobId, "01", errorMessage);
         }
-
     }
 
+    @PostMapping("/kill")
+    public void shutdownExternalJob(@RequestBody Map<String, Object> requestParam) {
+        log.info("외부데이터 작업 중지 요청 수신 - 요청 데이터 : {}", requestParam);
+        String jobId = requestParam.get("JB_ID").toString();
+        try {
+            log.info("작업 중지 요청 - 작업 ID: {}", jobId);
+            JobManager.stopJob(jobId);
+            log.info("작업이 중지 중입니다... 작업 ID : {}", jobId);
+            String errorMessage = "작업 중지 요청으로 해당 작업을 종료합니다.";
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("JB_ID", jobId);
+            payload.put("SRC_TYPE", "01");
+            payload.put("EXE_STSC", "99");
+            payload.put("EXE_JB_RNG", "02");
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(payload, headers);
+            String restUrl = "http://" + agentUrl + ":" + agentPort + "/v1/batch/status/external/releaseConnection";
+            log.info("Agent Url : {}", restUrl);
+            restTemplate.postForEntity(restUrl, requestEntity, Void.class);
+        } catch (NoSuchElementException e) {
+            log.info("대기큐에서 대기중인 작업이 있는지 확인");
+            boolean success = queueManager.removeTaskByJobId(jobId);
+            if (!success) {
+                throw new RuntimeException("실행상태 또는 대기상태의 작업이 아닙니다. " + jobId);
+            }
+            log.info("대기큐에서 대기중인 작업을 종료하였습니다. : {} ", jobId);
+        } catch (Exception e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
 
-
+    private void sendErrorStatus(String jobId, String srcUseType, String errorMessage) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("JB_ID", jobId);
+        payload.put("EXE_STSC", "99");
+        payload.put("EXE_JB_RNG", srcUseType);
+        payload.put("ERR_LOG", errorMessage);
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(payload, headers);
+        String restURl = "{managerUrl}" + "/dp/external/status/update";
+        restTemplate.postForEntity(restURl, requestEntity, Void.class);
+    }
 
     @PostMapping("/execute/api/collector")
     public void executeApiJob(@RequestBody Map<String, Object> request){
