@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @SpringBootApplication
 @RequiredArgsConstructor
-public class ExternalUrlApplication implements CommandLineRunner {
+public class ApiCollectorApplication implements CommandLineRunner {
 
     private final ObjectMapper objectMapper;
     private final ApplicationContext context;
@@ -40,11 +40,11 @@ public class ExternalUrlApplication implements CommandLineRunner {
     private ExecutorService executorService;
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = new SpringApplicationBuilder(ExternalUrlApplication.class)
+        ConfigurableApplicationContext context = new SpringApplicationBuilder(ApiCollectorApplication.class)
                             .web(WebApplicationType.NONE)
                             .run(args);
         SpringApplication.exit(context, () -> 0);
-        SpringApplication.run(ExternalUrlApplication.class, args);
+        SpringApplication.run(ApiCollectorApplication.class, args);
     }
 
     @Override
