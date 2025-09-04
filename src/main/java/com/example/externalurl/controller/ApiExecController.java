@@ -1,5 +1,7 @@
 package com.example.externalurl.controller;
 
+import com.example.externalurl.component.QueueManager;
+import com.example.externalurl.util.JobManager;
 import com.example.externalurl.util.ShellCommandUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +35,7 @@ public class ApiExecController {
 
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
-    private final DiscoveryReConnectUtil discoveryReConnectUtil;
+    //private final DiscoveryReConnectUtil discoveryReConnectUtil;
     private final ShellCommandUtil shellCommandUtil;
     private final QueueManager queueManager;
 
@@ -195,6 +197,7 @@ public class ApiExecController {
             JobManager.stopJob(jobId);
             log.info("작업이 중지 중입니다... 작업 ID : {}", jobId);
             String errorMessage = "작업 중지 요청으로 해당 작업을 종료합니다.";
+            // this.sendErrorStatus(jobId, "01", errorMessage);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             Map<String, Object> payload = new HashMap<>();
