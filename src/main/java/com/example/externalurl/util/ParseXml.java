@@ -14,7 +14,7 @@ import java.util.*;
 
 @Slf4j
 public class ParseXml {
-    public static int reponseTotalCount(String xmlResponse, String tagName) {
+    public static int responseTotalCount(String xmlResponse, String tagName) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder;
         Document document;

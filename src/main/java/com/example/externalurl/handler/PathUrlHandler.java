@@ -1,7 +1,15 @@
 package com.example.externalurl.handler;
 
+import com.example.externalurl.component.RawApiDataLoader;
+import com.example.externalurl.util.DynamicUrlBuilder;
+import com.example.externalurl.util.FetchApi;
+import com.example.externalurl.util.ParseJson;
+import com.example.externalurl.util.ParseXml;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -26,7 +34,7 @@ public class PathUrlHandler extends AbstractUrlHandler {
         bsInfoMap.put("BSDT_KEY", bsDtKey);
         bsInfoMap.put("BSDT", bsDt);
 
-        String baseUrl = DynamicUrlBuilder.builderUrl(apiUrl, urlParam, true, reqUrlType, bsInfoMap);
+        String baseUrl = DynamicUrlBuilder.buildUrl(apiUrl, urlParam, true, reqUrlType, bsInfoMap);
         String fetchApiData = FetchApi.fetchApiData(baseUrl, dataFormat);
 
         if (fetchApiData.contains("RESPONSE_FAIL") || fetchApiData.isEmpty() || fetchApiData.isBlank()) {
@@ -37,7 +45,7 @@ public class PathUrlHandler extends AbstractUrlHandler {
             return null;
         }
 
-        if(!fetchApiData.contain(totalCal) || !fetchApiData.contains(keyName)) {
+        if(!fetchApiData.contains(totalCal) || !fetchApiData.contains(keyName)) {
             result.put("ERROR_CODE", "TRUE");
             result.put("HB_RESP", fetchApiData);
             result.put("IS_PAGE", true);
@@ -110,6 +118,11 @@ public class PathUrlHandler extends AbstractUrlHandler {
 
         result.put("IS_PAGE", false);
         result.put("B_RESP", List.of(map));
+    }
+
+    @Override
+    protected Map<String, Object> executeJob(Map<String, Object> urlParam, Map<String, Object> metaInfo) {
+        return null;
     }
     return result;
 }

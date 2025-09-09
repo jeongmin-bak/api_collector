@@ -46,7 +46,7 @@ public abstract class AbstractUrlHandler implements UrlHandler {
 
         boolean isPath = Boolean.parseBoolean((String) metaInfo.get("IS_PATH"));
         String reqUrlType = metaInfo.get("URL_REQ_TYPE").toString();
-        String baseUrl = DynamicUrlBuilder.builderUrl(apiUrl, urlParam, isPath, reqUrlType, bsInfoMap);
+        String baseUrl = DynamicUrlBuilder.buildUrl(apiUrl, urlParam, isPath, reqUrlType, bsInfoMap);
         log.info("baseUrl : {}", baseUrl);
 
         Map<String, Object> apiData = executeJob(urlParam, metaInfo);
