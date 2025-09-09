@@ -119,9 +119,13 @@ public class ParseJson {
         return dataList;
     }
 
+    /**
+     * 중첩된 키를 탐색하여 대상 노드 반환
+     **/
     private static JsonNode searchNestedKey(JsonNode rootNode, String keyName) {
         if (rootNode.has(keyName)) {
             JsonNode targetNode = rootNode.get(keyName);
+            // 만약 대상 노드가 객체이고, 동일 키를 포함하는 경우 더 깊이 탐색
             if (targetNode.isObject() && targetNode.has(keyName)) {
                 return targetNode.get(keyName);
             }

@@ -8,8 +8,12 @@ import com.example.externalurl.util.ParseXml;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+<<<<<<< HEAD
 import java.util.HashMap;
 import java.util.Map;
+=======
+import java.util.*;
+>>>>>>> origin
 
 @Slf4j
 @Component
@@ -34,7 +38,11 @@ public class PathUrlHandler extends AbstractUrlHandler {
         bsInfoMap.put("BSDT_KEY", bsDtKey);
         bsInfoMap.put("BSDT", bsDt);
 
+<<<<<<< HEAD
         String baseUrl = DynamicUrlBuilder.buildUrl(apiUrl, urlParam, true, reqUrlType, bsInfoMap);
+=======
+        String baseUrl = DynamicUrlBuilder.buildUrl(apiUrl, urlParam, true, reqUrlType, bsInfoMap); // 3번째 파라미터를 기준으로 URL 생성 로직이 다름
+>>>>>>> origin
         String fetchApiData = FetchApi.fetchApiData(baseUrl, dataFormat);
 
         if (fetchApiData.contains("RESPONSE_FAIL") || fetchApiData.isEmpty() || fetchApiData.isBlank()) {
@@ -49,12 +57,14 @@ public class PathUrlHandler extends AbstractUrlHandler {
             result.put("ERROR_CODE", "TRUE");
             result.put("HB_RESP", fetchApiData);
             result.put("IS_PAGE", true);
+            return result;
         }
         result.put("HB_RESP", fetchApiData);
 
         int totalCnt;
         if (!cntKey.isEmpty() && !cntKey.isBlank()) {
-            totalCnt = isJson ? ParseJson.responseTotalCount(fetchApiData, cntKey) : ParseXml.responseTotalCount(fetchApiData, cntKey);
+            totalCnt = isJson ? ParseJson.responseTotalCount(fetchApiData, cntKey) : ParseXml.reponseTotalCount(fetchApiData, cntKey);
+            log.info("수집 대상 데이터 개수 : {}", totalCnt);
         } else {
             totalCnt = 0;
         }
@@ -64,7 +74,7 @@ public class PathUrlHandler extends AbstractUrlHandler {
             return null;
         }
 
-        if (totalCnt > 0 || (cntKey.isEmpty()) || cntKey.isBlank())) {
+        if (totalCnt > 0 || (cntKey.isEmpty() || cntKey.isBlank())) {
             if (totalCnt <= MAX_API_BATCH_SIZE) {
                 result.put("IS_PAGE", false);
                 List<Map<String, Object>> dataList;
@@ -74,7 +84,7 @@ public class PathUrlHandler extends AbstractUrlHandler {
                     if (isJson) {
                         dataList = ParseJson.response(fetchApiData);
                     } else {
-                        throw new RuntimeException("처리할 수 없는 응답 형식입니다.");
+                        throw new RuntimeException("처리할 수 없는 응답 형식 입니다.");
                     }
                 
                 }
@@ -82,13 +92,14 @@ public class PathUrlHandler extends AbstractUrlHandler {
                     Map<String, Object> map = new HashMap<>();
                     map.put("API_URL", baseUrl);
                     map.put("ROW_DATA", rowData);
+                    return map;
                }).toList();
                result.put("B_RESP", dataInfo);
             }
         } else {
             // 페이지네이션 처리 시작
             result.put("IS_PAGE", true);
-            int totalPageCount = (int) Math.ceil((double) totalCnt / MAX_BATCH_SIZE);
+            int totalPageCount = (int) Math.ceil((double) totalCnt / MAX_API_BATCH_SIZE);
             log.info("총 페이지 수 : {}", totalPageCount);
             result.put("TOTAL_PAGE", totalPageCount);
             for (int page = 1; page <= totalPageCount ; page++ ){
@@ -110,8 +121,7 @@ public class PathUrlHandler extends AbstractUrlHandler {
                 }).toList();
                 result.put("B_RESP_"+page, dataInfo);
             }
-        }
-    } else {
+        } else {
         Map<String, Object> map = new HashMap<>();
         map.put("API_URL", baseUrl);
         map.put("ROW_DATA", " ");
@@ -120,9 +130,13 @@ public class PathUrlHandler extends AbstractUrlHandler {
         result.put("B_RESP", List.of(map));
     }
 
+<<<<<<< HEAD
     @Override
     protected Map<String, Object> executeJob(Map<String, Object> urlParam, Map<String, Object> metaInfo) {
         return null;
     }
     return result;
 }
+=======
+}
+>>>>>>> origin

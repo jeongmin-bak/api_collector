@@ -34,7 +34,7 @@ public class QueryUrlHandler extends AbstractUrlHandler {
         bsInfoMap.put("BSDT_KEY", bsDtKey);
         bsInfoMap.put("BSDT", bsDt);
 
-        String baseUrl = DynamicUrlBuilder.builderUrl(apiUrl, urlParam, true, reqUrlType, bsInfoMap);
+        String baseUrl = DynamicUrlBuilder.buildUrl(apiUrl, urlParam, true, reqUrlType, bsInfoMap);
         String fetchApiData = FetchApi.fetchApiData(baseUrl, dataFormat);
 
         if (fetchApiData.contains("RESPONSE_FAIL")) {

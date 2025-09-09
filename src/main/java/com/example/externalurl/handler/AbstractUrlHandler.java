@@ -69,14 +69,20 @@ public abstract class AbstractUrlHandler implements UrlHandler {
                 return;
             }
         }
-        String hbResp = (String) apiData.get("HB_RESP");
+        String hbResp = (String) apiData.get("HB_RESP"); // Header Body Reponse의 줄임말
 
-        // 서비스키가 다르면 중복되는 데이터가 저장되기 때문에 서비스키 제거하는 작업 필요
+        // 서비스키가 다르면 중복되는 데이터가 저장되기 때문에
+        // 서비스키 제거하는 작업 필요
         ObjectMapper mapper = new ObjectMapper();
+        log.info("isPage : {}", isPage);
         if(!isPage) {
             String removeTokenUrl = DynamicUrlBuilder.removeServiceKey(baseUrl);
             apiDataLoader.deleteRawApiDataDetail(removeTokenUrl, bsDt);
+            apiDataLoader.insertRawApiData(dataPvGp, apiSvc, removeTokenUrl, dataSeqId, dataProvider, apiExpl, apiData.get("HB_RESP").toString(), dataFormat, bsDt, jbDt_formatted);
 
+            // 바디데이터 저장
+            log.info("바디데이터 저장 시작 [페이지 처리가 아닌 수집 작업] : {}", baseUrl);
+            apiDataLoader.deleteRawApiDataDetail(removeTokenUrl, bsDt);
             List<Map<String, Object>> bResp = (List<Map<String, Object>>) apiData.get("B_RESP");
             bResp.forEach(map -> {
                 String seqValue = UUID.randomUUID().toString();
@@ -89,32 +95,34 @@ public abstract class AbstractUrlHandler implements UrlHandler {
                 }
                 apiDataLoader.insertRawApiDataDetail(dataPvGp, apiSvc, removeTokenUrl, apiSvcId, dataProvider, apiExpl, json, dataFormat, bsDt, jbDt_formatted);
             });
-        } else {
+        } else { // 페이지네이션 처리
             int totalPage = (int) apiData.get("TOTAL_PAGE");
             for(int page = 1; page <= totalPage; page++) {
                 String pageUrl = (String) apiData.get("PAGE_URL_") + page;
                 String removeTokenPageUrl = DynamicUrlBuilder.removeServiceKey(pageUrl);
 
+                log.info("원천소스 저장 시작 [페이지 처리 작업] : {}", removeTokenPageUrl);
                 apiDataLoader.deleteRawApiData(removeTokenPageUrl, bsDt);
                 apiDataLoader.insertRawApiData(dataPvGp, apiSvc, removeTokenPageUrl, dataSeqId, dataProvider, apiExpl, hbResp, dataFormat, bsDt, jbDt_formatted);
 
+                log.info("바디데이터 저장 시작 [페이지 처리 작업] : {}", removeTokenPageUrl);
                 apiDataLoader.deleteRawApiDataDetail(removeTokenPageUrl, bsDt);
+            }
 
-                for (int page = 1; page <= totalPage; page++) {
-                    List<Map<String, Object>> bResp = (List<Map<String, Object>>) apiData.get("B_RESP_" + page);
-                    bResp.forEach(map -> {
-                        String json;
-                        try {
-                            json = mapper.writeValueAsString(map.get("ROW_DATA"));
-                        } catch (JsonProcessingException e ) {
-                            throw new RuntimeException(e);
-                        }
-                        String seqValue = UUID.randomUUID().toString();
-                        String apiSvcId = apiSvc + "_" + seqValue;
-                        String removeTokenPageUrl = DynamicUrlBuilder.removeServiceKey((String) map.get("API_URL"));
-                        apiDataLoader.insertRawApiDataDetail(dataPvGp, apiSvc, removeTokenPageUrl, apiSvcId, dataProvider, apiExpl, json, dataFormat, bsdt, jbDt_formatted);
-                    });
-                }
+            for (int page = 1; page <= totalPage; page++) {
+                List<Map<String, Object>> bResp = (List<Map<String, Object>>) apiData.get("B_RESP_" + page);
+                bResp.forEach(map -> {
+                    String json;
+                    try {
+                        json = mapper.writeValueAsString(map.get("ROW_DATA"));
+                    } catch (JsonProcessingException e ) {
+                        throw new RuntimeException(e);
+                    }
+                    String seqValue = UUID.randomUUID().toString();
+                    String apiSvcId = apiSvc + "_" + seqValue;
+                    String removeTokenPageUrl = DynamicUrlBuilder.removeServiceKey((String) map.get("API_URL"));
+                    apiDataLoader.insertRawApiDataDetail(dataPvGp, apiSvc, removeTokenPageUrl, apiSvcId, dataProvider, apiExpl, json, dataFormat, bsDt, jbDt_formatted);
+                });
             }
         }
         log.info("{} : 수집작업완료", baseUrl);
