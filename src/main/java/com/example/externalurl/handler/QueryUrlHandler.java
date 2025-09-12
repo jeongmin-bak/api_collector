@@ -53,7 +53,7 @@ public class QueryUrlHandler extends AbstractUrlHandler {
 
         int totalCnt;
         if (!cntKey.isEmpty() && !cntKey.isBlank()) {
-            totalCnt = isJson ? ParseJson.responseTotalCount(fetchApiData, cntKey) : ParseXml.reponseTotalCount(fetchApiData, cntKey);
+            totalCnt = isJson ? ParseJson.responseTotalCount(fetchApiData, cntKey) : ParseXml.responseTotalCount(fetchApiData, cntKey);
             log.info("수집 대상 데이터 개수 : {}", totalCnt);
         } else {
             totalCnt = 0;
@@ -64,7 +64,7 @@ public class QueryUrlHandler extends AbstractUrlHandler {
             return null;
         }
 
-        if (totalCnt > 0 || (cntKey.isEmpty()) || cntKey.isBlank())) {
+        if (totalCnt > 0 || (cntKey.isEmpty()) || cntKey.isBlank()) {
             if (totalCnt <= MAX_API_BATCH_SIZE) {
                 result.put("IS_PAGE", false);
                 List<Map<String, Object>> dataList;
@@ -86,12 +86,11 @@ public class QueryUrlHandler extends AbstractUrlHandler {
                     map.put("ROW_DATA", rowData);
                     return map;
                }).toList();
-               result.put("B_RESP", dataInfo);
-            }
+            result.put("B_RESP", dataInfo);
         } else {
             // 페이지네이션 처리 시작
             result.put("IS_PAGE", true);
-            int totalPageCount = (int) Math.ceil((double) totalCnt / MAX_BATCH_SIZE);
+            int totalPageCount = (int) Math.ceil((double) totalCnt / MAX_API_BATCH_SIZE);
             log.info("총 페이지 수 : {}", totalPageCount);
             result.put("TOTAL_PAGE", totalPageCount);
             for (int page = 1; page <= totalPageCount ; page++ ){
