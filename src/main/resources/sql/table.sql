@@ -1,24 +1,22 @@
 create table API_BAS_INFO (
-    API_MEATA_ID    VARCHAR2(500) not null,
-    API_URL         VARCHAR2(1000) not null,
-    API_SVC         VARCHAR2(500) not null,
-    DATA_PV_GP      VARCHAR2(10) not null,
-    DATA_FORMAT     VARCHAR2(10),
-    API_EXPL        VARCHAR2(1000),
-    IS_QUERY        VARCHAR2(50),
-    IS_PATH         VARCHAR2(50),
-    SRC_CONT_ID     VARCHAR2(500),
-    PAGE_KEY        VARCHAR2(100),
-    TOTAL_KEY       VARCHAR2(100),
-    CNT_KEY         VARCHAR2(100),
-    KEY_NAME        VARCHAR2(100),
-    FRST_RGS_DTM    VARCHAR2(200),
-    LAST_RGS_DTM    VARCHAR2(200),
-    BSDT_KEY        VARCHAR2(100),
-    BSDT            VARCHAR2(8),
-    URL_REQ_TYPE    VARCHAR2(10),
-    constraint PK_API_BASE_INFO
-        primary key (API_META_ID, API_SVC, DATA_PV_GPs)
+                              API_META_ID    VARCHAR2(500) not null,
+                              API_URL         VARCHAR2(1000) not null,
+                              API_SVC         VARCHAR2(500) not null,
+                              DATA_PV_GP      VARCHAR2(10) not null,
+                              DATA_FORMAT     VARCHAR2(10),
+                              URL_REQ_TYPE    VARCHAR2(10),
+                              API_EXPL        VARCHAR2(1000),
+                              REQ_API         VARCHAR2(50),
+                              PAGE_KEY        VARCHAR2(100),
+                              TOTAL_KEY       VARCHAR2(100),
+                              CNT_KEY         VARCHAR2(100),
+                              KEY_NAME        VARCHAR2(100),
+                              BSDT_KEY        VARCHAR2(100),
+                              BSDT            VARCHAR2(8),
+                              FRST_RGS_DTM    VARCHAR2(200),
+                              LAST_RGS_DTM    VARCHAR2(200),
+                              constraint PK_API_BASE_INFO
+                                  primary key (API_META_ID, API_SVC, DATA_PV_GP)
 );
 
 create table API_KEY_PARAM (
@@ -36,9 +34,9 @@ create table API_KEY_PARAM (
 create table API_VALUE_PARAM (
     API_MEATA_ID    VARCHAR2(500) not null,
     KEY_NM          VARCHAR2(500),
+    CD_GRP_ID       VARCHAR2(500),
     CD_ID           VARCHAR2(500),
     EACH_REQ_PARAMS VARCHAR2(1000),
-    CD_GRP_ID       VARCHAR2(500),
 );
 
 create table API_CD_BAS (

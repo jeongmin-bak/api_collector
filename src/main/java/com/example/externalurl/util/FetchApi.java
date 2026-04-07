@@ -34,6 +34,7 @@ public class FetchApi {
                     String resContentType = conn.getHeaderField("Content-Type").toLowerCase();
                     if (conn.getResponseCode() == HttpURLConnection.HTTP_OK || (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300)) {
                         br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
+                        response = br.lines().collect(Collectors.joining());
                         successCheck = true;
                         break;
                     }

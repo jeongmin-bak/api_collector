@@ -1,9 +1,5 @@
 package com.example.externalurl.component;
 
-import com.didimdp.batch.collector.agent.job.Task;
-import com.didimdp.batch.collector.agent.service.NotificationService;
-import com.didimdp.batch.collector.agent.util.JobManager;
-import com.didimdp.batch.collector.agent.util.TaskQueueService;
 import com.example.externalurl.service.NotificationService;
 import com.example.externalurl.util.JobManager;
 import com.example.externalurl.util.TaskQueueService;

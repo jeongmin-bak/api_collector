@@ -1,23 +1,32 @@
+package com.example.externalurl.util;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 @RequiredArgsConstructor
 @Component
 @Slf4j
 public class DiscoveryReConnectUtil {
     private final RestTemplate restTemplate;
-    private final DidimDiscoveryClient discoveryClient;
 
     public String restConnectWithRetryManager() {
         int maxRetries = 3;
         int retryDelay = 10 * 1000;
 
-        for (int atempt = 1; attempt <= maxRetries; attempt++) {
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
             boolean forcedHaFlag = (attempt == maxRetries);
             String managerUrl = "{managerurl}";
             String restUrl = managerUrl + "/dp/restCheck";
 
             try {
                 HttpEntity<String> requestEntity = new HttpEntity<>(null);
-                ResponseEntity<String> response = restTemplate.exchange(restUrl, HtpMethod.GET, requestEntity, String.class);
+                ResponseEntity<String> response = restTemplate.exchange(restUrl, HttpMethod.GET, requestEntity, String.class);
                 HttpStatusCode status = response.getStatusCode();
 
                 if (status.is2xxSuccessful()) {

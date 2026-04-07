@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 @RequestMapping("/v1/batch/external")
 @RequiredArgsConstructor
 public class ApiLogController {
-    @Value("${agnet.batch.logs.dir_path}")
+    @Value("${agent.batch.logs.dir_path}")
     private String LOG_DIRECTORY;
 
     @PostMapping("/log")

@@ -7,8 +7,8 @@ server:
 # 공통 경로 설정
 common:
   params:
-    extract_tmp_dir: /Users/parkjungmin/Desktop/external_url/api_dir/tmp
-    meta_info_path: /Users/parkjungmin/Desktop/external_url/api_dir
+    extract_tmp_dir: /Users/bagjeongmin/Desktop/SpringBoot/api_dir/tmp
+    meta_info_path: /Users/bagjeongmin/Desktop/SpringBoot/api_dir/meta
 
 # agent 관련
 agent:
@@ -20,30 +20,24 @@ agent:
     queue_size: 10
     timeout: 10
     connection_count: 100
-
   batch:
     shell_scripts:
       start_java_batch: /test/startJavaBatch.sh
       start_proc_batch: /test/startProcBatch.sh
       start_multi_batch: /test/startMultiBatch.sh
+      start_api_batch: /test/startApiBatch.sh
     paths:
       job_meta_file_path: ${common.params.meta_info_path}
     logs:
-      dir_path: ${LOG_DIR}
+      dir_path: /Users/bagjeongmin/Desktop/SpringBoot/api_dir/logs
 
 spring:
   application:
-    name: test-collector
+    name: api-collector
   datasource:
-    url: jdbc:oracle:thin:@database02.didim365.co:1521:rwk
-    username: batch_user
-    password: fpemdnemzpdl123$
-
-sub-db:
-  driver: oracle.jdbc.OracleDriver
-  url: jdbc:oracle:thin:@192.168.150.35:1521:RWK
-  username: didimdp
-  password: fpemdnemzpdl123$
+    url: jdbc:oracle:thin:@localhost:1521:XE
+    username: api_col
+    password: 1234
 
 hikari:
   connection-timeout: 1800000

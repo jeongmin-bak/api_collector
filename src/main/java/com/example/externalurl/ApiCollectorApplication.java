@@ -45,7 +45,6 @@ public class ApiCollectorApplication implements CommandLineRunner {
                             .web(WebApplicationType.NONE)
                             .run(args);
         SpringApplication.exit(context, () -> 0);
-        SpringApplication.run(ApiCollectorApplication.class, args);
     }
 
     @Override
@@ -67,7 +66,6 @@ public class ApiCollectorApplication implements CommandLineRunner {
         // 필수 요소 파라미터
         int contCnt = (int) metaInfo.get("CON_CNT");
         executorService = Executors.newFixedThreadPool(contCnt);
-
         boolean isQuery = Boolean.parseBoolean((String) metaInfo.get("IS_QUERY"));
         boolean isPath = Boolean.parseBoolean((String) metaInfo.get("IS_PATH"));
         List<Map<String, Object>> apiParam = (List<Map<String, Object>>) metaInfo.get("API_PARAM");
