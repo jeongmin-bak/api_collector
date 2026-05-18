@@ -14,18 +14,18 @@ public class RawApiDataLoader {
     private final JdbcTemplate jdbcTemplate;
 
     public void deleteRawApiData(String apiUrl, String jbDt) {
-        String deleteStmt = "DELETE FROM SWCDITBFAD001 WHERE OTSD_LINK_URL = ? AND BSDT = ?";
+        String deleteStmt = "DELETE FROM STG_API_RAW WHERE OTSD_LINK_URL = ? AND BSDT = ?";
         jdbcTemplate.update(deleteStmt, apiUrl, jbDt);
     
     }
 
     public void deleteRawApiDataDetail(String apiUrl, String jbDt) {
-        String deleteStmt = "DELETE FROM SWCDITBFAD002 WHERE OTSD_LINK_URL = ? AND BSDT = ?";
+        String deleteStmt = "DELETE FROM STG_API_PARSED WHERE OTSD_LINK_URL = ? AND BSDT = ?";
         jdbcTemplate.update(deleteStmt, apiUrl, jbDt);
     }
 
     public void insertRawApiData(String dataPvGp, String apiSvc, String apiUrl, String apiSn, String dataProvider, String apiExpl, String responseData, String dataFormat, String bsDt, String jbDt) {
-        String sql = "INSERT INTO SWCDITBFAD001 (FRG_BUR_C, SV_NM, OTST_LINK_URL, LNK_DTA_DRM_ID, FRG_IF_BUR_NM, API_DFNTN_CN, API_RSP_CN, COL_DTA_TP_NM, BSDT, LDNG_TS)" +
+        String sql = "INSERT INTO STG_API_RAW (FRG_BUR_C, SV_NM, OTSD_LINK_URL, LNK_DTA_DRM_ID, FRG_IF_BUR_NM, API_DFNTN_CN, API_RSP_CN, COL_DTA_TP_NM, BSDT, LDNG_TS)" +
                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
@@ -40,7 +40,7 @@ public class RawApiDataLoader {
     }
 
     public void insertRawApiDataDetail(String dataPvGp, String apiSvc, String apiUrl, String apiSn, String dataProvider, String apiExpl, String responseData, String dataFormat, String bsDt, String jbDt) {
-        String sql = "INSERT INTO SWCDITBFAD002 (FRG_BUR_C, SV_NM, OTST_LINK_URL, LNK_DTA_DRM_ID, FRG_IF_BUR_NM, API_DFNTN_CN, API_RSP_CN, COL_DTA_TP_NM, BSDT, LDNG_TS)" +
+        String sql = "INSERT INTO STG_API_PARSED (FRG_BUR_C, SV_NM, OTSD_LINK_URL, LNK_DTA_DRM_ID, FRG_IF_BUR_NM, API_DFNTN_CN, API_RSP_CN, COL_DTA_TP_NM, BSDT, LDNG_TS)" +
                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
